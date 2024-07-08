@@ -30,3 +30,8 @@ kotlinc kes.kt -include-runtime -d kes.jar
 ### run build  
 java -jar kes.jar
 
+## bash
+### run
+./kes.sh
+
+

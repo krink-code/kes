@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 xorEncrypt() {
     plaintext="$1"
     keyStr="$2"
@@ -34,8 +33,6 @@ xorDecrypt() {
     echo -n -e "$decryptedData"
 }
 
-
-
 vigenereEncrypt() {
     plaintext="$1"
     keyStr="$2"
@@ -65,7 +62,6 @@ vigenereDecrypt() {
 
     echo -n -e "$decryptedData"
 }
-
 
 encryptRailFence() {
     plaintext="$1"
@@ -100,38 +96,48 @@ decryptRailFence() {
     base64Cipher="$1"
     numRails="$2"
     cipherText=$(echo -n "$base64Cipher" | base64 -d)
-    railLength=$(( (${#cipherText} + numRails - 1) / numRails ))
-    numRows=$(( (railLength - 1) * 2 + 1 ))
-
-    rails=()
-    for ((i = 0; i < numRows; i++)); do
-        rails+=("")
-    done
-
+    railLengths=()
     railIndex=0
     direction=1
+    for ((i=0; i<${#cipherText}; i++)); do
+        railLengths[$railIndex]=$((railLengths[$railIndex]+1))
 
-    for ((i = 0; i < ${#cipherText}; i++)); do
-        char="${cipherText:$i:1}"
-        rails[railIndex]+="$char"
-
-        if [ $railIndex -eq 0 ]; then
+        if [ "$railIndex" -eq 0 ]; then
             direction=1
-        elif [ $railIndex -eq $((numRows - 1)) ]; then
+        elif [ "$railIndex" -eq "$((numRails-1))" ]; then
             direction=-1
         fi
 
         railIndex=$((railIndex + direction))
     done
 
+    rails=()
+    cipherIndex=0
+    for ((i=0; i<numRails; i++)); do
+        rails[$i]="${cipherText:cipherIndex:railLengths[$i]}"
+        cipherIndex=$((cipherIndex + railLengths[$i]))
+    done
+
+    railIndex=0
+    direction=1
     plainText=""
-    for ((i = 0; i < numRows; i++)); do
-        plainText+="${rails[i]}"
+    railPositions=(0)
+
+    for ((i=0; i<${#cipherText}; i++)); do
+        plainText+="${rails[$railIndex]:0:1}"
+        rails[$railIndex]="${rails[$railIndex]:1}"
+
+        if [ "$railIndex" -eq 0 ]; then
+            direction=1
+        elif [ "$railIndex" -eq "$((numRails-1))" ]; then
+            direction=-1
+        fi
+
+        railIndex=$((railIndex + direction))
     done
 
     echo -n "$plainText" | base64 -d
 }
-
 
 encryptKES() {
     plainText="$1"
@@ -207,5 +213,4 @@ encryptedData=$(encryptKES "$plaintext" "$encryptionKey")
 echo "Encrypted Data: $encryptedData"
 decryptedData=$(decryptKES "$encryptedData" "$encryptionKey")
 echo "Decrypted Data: $decryptedData"
-
 
