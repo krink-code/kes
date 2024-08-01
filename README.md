@@ -1,7 +1,10 @@
 # KES
 K Encryption Standard  
-KES is simple encryption that uses standard progamming languages (no special libraries)  
+
+KES is simple encryption that uses standard progamming languages (no special libraries).  
 Python, Go, Swift, Kotlin, and Bash.
+
+[![License: WTFPL](https://img.shields.io/badge/License-WTFPL-brightgreen.svg)](http://www.wtfpl.net/about/)  
 
 ## python3
 ### run
